@@ -1,0 +1,181 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_EMPLOYEES 100
+
+// Define the Employee structure
+struct Employee {
+    int id;
+    char name[50];
+    char designation[50];
+    float salary;
+};
+
+// Global array and tracking counter
+struct Employee employees[MAX_EMPLOYEES];
+int employeeCount = 0;
+
+// Function Prototypes
+void addEmployee();
+void displayEmployees();
+void searchEmployee();
+void deleteEmployee();
+void clearInputBuffer();
+
+int main() {
+    int choice;
+
+    while (1) {
+        printf("\n====================================");
+        printf("\n     EMPLOYEE MANAGEMENT SYSTEM     ");
+        printf("\n====================================");
+        printf("\n1. Add Employee Record");
+        printf("\n2. Display All Employee Records");
+        printf("\n3. Search Employee by ID");
+        printf("\n4. Delete Employee Record");
+        printf("\n5. Exit");
+        printf("\n====================================");
+        printf("\nEnter your choice (1-5): ");
+        
+        if (scanf("%d", &choice) != 1) {
+            printf("Invalid input. Please enter a number.\n");
+            clearInputBuffer();
+            continue;
+        }
+
+        switch (choice) {
+            case 1:
+                addEmployee();
+                break;
+            case 2:
+                displayEmployees();
+                break;
+            case 3:
+                searchEmployee();
+                break;
+            case 4:
+                deleteEmployee();
+                break;
+            case 5:
+                printf("\nExiting the system. Goodbye!\n");
+                return 0;
+            default:
+                printf("\nInvalid selection! Please choose between 1 and 5.\n");
+        }
+    }
+    return 0;
+}
+
+// Function to add a new employee
+void addEmployee() {
+    if (employeeCount >= MAX_EMPLOYEES) {
+        printf("\nDatabase is full! Cannot add more employees.\n");
+        return;
+    }
+
+    struct Employee emp;
+    printf("\nEnter Employee ID: ");
+    scanf("%d", &emp.id);
+    
+    // Check if ID already exists
+    for (int i = 0; i < employeeCount; i++) {
+        if (employees[i].id == emp.id) {
+            printf("Error: Employee with ID %d already exists!\n", emp.id);
+            return;
+        }
+    }
+
+    clearInputBuffer(); // Clear leftover newline
+    printf("Enter Employee Name: ");
+    fgets(emp.name, sizeof(emp.name), stdin);
+    emp.name[strcspn(emp.name, "\n")] = 0; // Remove trailing newline
+
+    printf("Enter Designation: ");
+    fgets(emp.designation, sizeof(emp.designation), stdin);
+    emp.designation[strcspn(emp.designation, "\n")] = 0; 
+
+    printf("Enter Salary: ");
+    scanf("%f", &emp.salary);
+
+    // Save into the array
+    employees[employeeCount] = emp;
+    employeeCount++;
+
+    printf("\nEmployee added successfully!\n");
+}
+
+// Function to display all employee records
+void displayEmployees() {
+    if (employeeCount == 0) {
+        printf("\nNo records found in the system.\n");
+        return;
+    }
+
+    printf("\n-------------------------------------------------------------------");
+    printf("\n%-10s %-25s %-20s %-10s", "ID", "Name", "Designation", "Salary");
+    printf("\n-------------------------------------------------------------------");
+    for (int i = 0; i < employeeCount; i++) {
+        printf("\n%-10d %-25s %-20s $%-9.2f", 
+               employees[i].id, employees[i].name, employees[i].designation, employees[i].salary);
+    }
+    printf("\n-------------------------------------------------------------------\n");
+}
+
+// Function to search for an employee by ID
+void searchEmployee() {
+    if (employeeCount == 0) {
+        printf("\nNo records available to search.\n");
+        return;
+    }
+
+    int searchId;
+    printf("\nEnter Employee ID to search: ");
+    scanf("%d", &searchId);
+
+    for (int i = 0; i < employeeCount; i++) {
+        if (employees[i].id == searchId) {
+            printf("\n--- Record Found ---");
+            printf("\nID:          %d", employees[i].id);
+            printf("\nName:        %s", employees[i].name);
+            printf("\nDesignation: %s", employees[i].designation);
+            printf("\nSalary:      $%.2f\n", employees[i].salary);
+            return;
+        }
+    }
+    printf("\nEmployee with ID %d not found.\n", searchId);
+}
+
+// Function to delete an employee record
+void deleteEmployee() {
+    if (employeeCount == 0) {
+        printf("\nNo records available to delete.\n");
+        return;
+    }
+
+    int deleteId, found = 0;
+    printf("\nEnter Employee ID to delete: ");
+    scanf("%d", &deleteId);
+
+    for (int i = 0; i < employeeCount; i++) {
+        if (employees[i].id == deleteId) {
+            found = 1;
+            // Shift remaining array elements to fill the gap
+            for (int j = i; j < employeeCount - 1; j++) {
+                employees[j] = employees[j + 1];
+            }
+            employeeCount--;
+            printf("\nEmployee record deleted successfully!\n");
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("\nEmployee with ID %d not found.\n", deleteId);
+    }
+}
+
+// Utility function to clean keyboard input buffer
+void clearInputBuffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
