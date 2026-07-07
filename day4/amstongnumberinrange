@@ -1,0 +1,16 @@
+#include <stdio.h>
+#include <math.h>
+int main() {
+    int l,u;
+    scanf("%d%d",&l,&u);
+    for(int i=l;i<=u;i++){
+        int temp=i,sum=0,d=(int)log10(i)+1;
+        while(temp!=0){
+            int r=temp%10;
+            sum+=pow(r,d);
+            temp/=10;
+        }
+        if(sum==i) printf("%d ",i);
+    }
+    return 0;
+}
